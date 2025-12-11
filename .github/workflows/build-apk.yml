@@ -2,29 +2,41 @@ name: Build APK
 
 on:
   push:
-    tags: ['v*']
+    tags: ['v*']  # Сборка при тегах: v1.0, v2.1 и т.д.
 
 jobs:
   build-apk:
     name: Build APK with Buildozer
     runs-on: ubuntu-latest
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
 
     steps:
-      - name: Checkout code
+      - name: 🔽 Checkout code
         uses: actions/checkout@v4
 
-      - name: Accept SDK licenses (auto)
-       run: |
-         yes | sdkmanager --licenses || true
-       env:
-         ANDROID_HOME: /usr/local/lib/android/sdk
- 
+      - name: 📑 Accept Android SDK licenses
+        run: |
+          mkdir -p "$ANDROID_HOME/licenses"
+          echo "d56f5187479451eabf01fb78af6dfcb131a6481e" > "$ANDROID_HOME/licenses/android-sdk-license"
+          echo "84831b9409646a918e30573bab4c9c91346d8abd" >> "$ANDROID_HOME/licenses/android-sdk-preview-license"
+          echo "✅ Licenses accepted"
 
-      - name: Build APK using Kivy Buildozer Docker
+      - name: 🛠️ Build APK using Kivy Buildozer Docker
         run: |
           docker run --rm -v $(pwd):/home/user/hostcwd kivy/buildozer android debug
 
-      - name: Upload APK to Release
+      - name: 📦 Verify APK exists
+        run: |
+          if [ -f "./bin/rttygen-0.1-debug.apk" ]; then
+            echo "✅ APK successfully built"
+            ls -la ./bin/
+          else
+            echo "❌ APK not found Check Buildozer logs."
+            exit 1
+          fi
+
+      - name: 🚀 Upload APK to Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: actions/upload-release-asset@v1
         env:
@@ -32,5 +44,5 @@ jobs:
         with:
           upload_url: ${{ github.event.repository.releases[0].upload_url }}
           asset_path: ./bin/rttygen-0.1-debug.apk
-          asset_name: rtty_generator.apk
+          asset_name: rtty_generator-${{ github.ref_name }}.apk
           asset_content_type: application/vnd.android.package-archive
