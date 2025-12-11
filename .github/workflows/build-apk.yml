@@ -13,11 +13,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Accept SDK licenses
-        run: |
-          yes | sdkmanager --licenses
-        # Опционально: добавьте проверку, что лицензии приняты
-        # echo "SDK licenses accepted"
+      - name: Accept SDK licenses (auto)
+       run: |
+         yes | sdkmanager --licenses || true
+       env:
+         ANDROID_HOME: /usr/local/lib/android/sdk
+ 
 
       - name: Build APK using Kivy Buildozer Docker
         run: |
