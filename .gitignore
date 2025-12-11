@@ -1,0 +1,52 @@
+# === Сборка Buildozer ===
+.buildozer/
+bin/
+platforms/
+python-for-android/
+
+# === Временные и системные файлы ===
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+virtualenv/
+.DS_Store          # macOS
+Thumbs.db          # Windows
+desktop.ini        # Windows
+
+# === Логи и отладка ===
+*.log
+.kivy/
+logs/
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.spec
+
+# === Редакторы и IDE ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# === APK и артефакты сборки ===
+*.apk
+*.aab
+*.ipa
+*.so
+
+# === Кэш и временные файлы Python ===
+pip-selfcheck.json
+pip.log
+*.egg-info/
+dist/
+build/
+*.egg
+*.whl
