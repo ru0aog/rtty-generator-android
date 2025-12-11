@@ -25,7 +25,7 @@ jobs:
         run: |
           docker run --rm -v $(pwd):/home/user/hostcwd kivy/buildozer android debug
 
-      - name: 📦 Verify APK exists
+      - name: Verify APK exists
         run: |
           if [ -f "./bin/rttygen-0.1-debug.apk" ]; then
             echo "✅ APK successfully built"
@@ -35,7 +35,7 @@ jobs:
             exit 1
           fi
 
-      - name: 🚀 Upload APK to Release
+      - name: Upload APK to Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: actions/upload-release-asset@v1
         env:
