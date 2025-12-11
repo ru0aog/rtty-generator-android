@@ -8,14 +8,34 @@ jobs:
   build-apk:
     name: Build APK with Buildozer
     runs-on: ubuntu-latest
+    permissions: # Добавляем разрешения для работы с релизами
+      contents: read
+      packages: write
+      id-token: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup Docker
+        uses: docker/setup-buildx-action@v2 # Подготавливаем Docker для сборки
+
       - name: Build APK using Kivy Buildozer Docker
         run: |
+          # Сначала принимаем лицензии SDK (решает проблему с пропусками лицензий)
+          docker run --rm -v $(pwd):/home/user/hostcwd kivy/buildozer android --accept-sdk-license
+          # Затем выполняем основную сборку
           docker run --rm -v $(pwd):/home/user/hostcwd kivy/buildozer android debug
+        working-directory: ./ # Указываем рабочую директорию
+        env: # Добавляем переменные окружения
+          ANDROID_SDK_ROOT: /usr/local/android-sdk
+          ANDROID_HOME: /usr/local/android-sdk
+
+      - name: Verify APK build
+        run: |
+          ls ./bin/ # Проверяем, что APK создан
+          echo "APK build verified"
+        if: always() # Выполняем всегда, даже если предыдущий шаг завершился с ошибкой
 
       - name: Upload APK to Release
         if: startsWith(github.ref, 'refs/tags/')
@@ -27,3 +47,9 @@ jobs:
           asset_path: ./bin/rttygen-0.1-debug.apk
           asset_name: rtty_generator.apk
           asset_content_type: application/vnd.android.package-archive
+
+      - name: Log build artifacts
+        run: |
+          echo "Build completed. APK uploaded."
+          ls -la ./bin/ # Логируем содержимое директории с APK
+
