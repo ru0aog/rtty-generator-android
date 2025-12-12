@@ -23,9 +23,9 @@ jobs:
           rm -rf ~/.android/cache
           rm -rf ~/.android/avd
       - name: Install SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
         with:
-          cmdline-tools-version: '7.0'
+          cmdline-tools-version: 'latest'
           accept-android-sdk-licenses: true
           log-accepted-android-sdk-licenses: true
           packages: |
