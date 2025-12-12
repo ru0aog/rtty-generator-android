@@ -26,6 +26,7 @@ jobs:
           log-accepted-android-sdk-licenses: true
           packages: |
             build-tools;36.1.0
+            yes | ~/Android/Sdk/tools/bin/sdkmanager --licenses
       - name: Build APK
         run: 
           buildozer -v android debug
