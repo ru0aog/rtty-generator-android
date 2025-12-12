@@ -11,3 +11,4 @@ fullscreen = 0
 
 [buildozer]
 log_level = 2
+platform = android
