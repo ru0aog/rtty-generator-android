@@ -24,6 +24,8 @@ jobs:
           cmdline-tools-version: 'latest'
           accept-android-sdk-licenses: true
           log-accepted-android-sdk-licenses: true
+          packages: |
+            build-tools;36.1.0
       - name: Build APK
         run: 
           buildozer -v android debug
