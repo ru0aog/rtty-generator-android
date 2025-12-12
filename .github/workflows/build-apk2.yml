@@ -7,76 +7,44 @@ on:
     branches: [ main ]
   workflow_dispatch:
 jobs:
-  build-apk:
-    name: Build APK with Buildozer
-    runs-on: ubuntu-latest
-    env:
-      ANDROID_HOME: /usr/local/lib/android/sdk
-      BUILD_DIR: ./bin
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Build APK using Kivy Buildozer Docker
-        run: |
-          docker run --rm -v $(pwd):/home/user/hostcwd kivy/buildozer android debug
-      - name: Verify APK was built
-        run: |
-          if [ -f "$BUILD_DIR/rttygen-0.1-debug.apk" ]; then
-            echo "APK successfully built"
-            ls -la "$BUILD_DIR/"
-          else
-            echo "APK not found. Check Buildozer logs."
-            exit 1
-          fi
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v4
+    - uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.16.0'
+    - run: flutter pub get
+    - run: flutter build apk --release
+    - uses: actions/upload-artifact@v4
+      with:
+        name: release-apk
+        path: build/app/outputs/flutter-apk/app-release.apk
 
-      - name: Upload APK to GitHub Release
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.repository.releases[0].upload_url }}
-          asset_path: "$BUILD_DIR/rttygen-0.1-debug.apk"
-          asset_name: "rtty_generator_${{ github.ref_name }}.apk"
-          asset_content_type: "application/vnd.android.package-archive"
-  build-android:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-      - name: Install dependencies
-        run: |
-          sudo add-apt-repository universe
-          sudo apt update || exit 1
-          sudo apt install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev || exit 1
-          pip install --upgrade pip
-          # pip install Cython==0.29.33 buildozer
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Build APK using Kivy Buildozer Docker
+      run: |
+        docker run --rm -v $(pwd):/home/user/hostcwd kivy/buildozer android debug
+    - name: Verify APK was built
+      run: |
+        if [ -f "$BUILD_DIR/rttygen-0.1-debug.apk" ]; then
+          echo "APK successfully built"
+          ls -la "$BUILD_DIR/"
+        else
+          echo "APK not found. Check Buildozer logs."
+          exit 1
+        fi
 
-
-      - name: Initialize Buildozer
-        run: buildozer init
-
-      - name: Configure buildozer.spec
-        run: |
-          # Замените значения на свои
-          sed -i 's/title = My Application/title = Генератор RTTY/g' buildozer.spec
-          sed -i 's/package.name = myapp/package.name = rttygen/g' buildozer.spec
-          sed -i 's/package.domain = org.test/package.domain = com.example/g' buildozer.spec
-          sed -i 's/source.dir = ./main.py/source.dir = ./main.py/g' buildozer.spec
-          sed -i 's/requirements = python3/requirements = python3,kivy,requests/g' buildozer.spec
-          sed -i 's/orientation = all/orientation = portrait/g' buildozer.spec
-          sed -i 's/android.api = 31/android.api = 33/g' buildozer.spec
-
-      - name: Build APK
-        run: yes | buildozer -v android debug
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: apk-file
-          path: bin/*.apk
-          retention-days: 7
+    - name: Upload APK to GitHub Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.repository.releases[0].upload_url }}
+        asset_path: "$BUILD_DIR/rttygen-0.1-debug.apk"
+        asset_name: "rtty_generator_${{ github.ref_name }}.apk"
+        asset_content_type: "application/vnd.android.package-archive"
+  
+        path: bin/*.apk
+        retention-days: 7
