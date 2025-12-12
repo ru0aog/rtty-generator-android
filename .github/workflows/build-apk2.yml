@@ -1,7 +1,5 @@
 name: Build APK with Buildozer
-
 on: [push]
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,6 +16,8 @@ jobs:
             python3-dev libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-gfx-dev \
             libsqlite3-dev libgles2-mesa-dev libglu1-mesa-dev libgl1-mesa-dev \
             libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+          sudo apt-get update
+          sudo apt-get install -y python3-cython
       - name: Build APK
         run: buildozer android debug
       - name: Upload APK
