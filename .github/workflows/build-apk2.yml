@@ -26,6 +26,11 @@ jobs:
           log-accepted-android-sdk-licenses: true
           packages: |
             build-tools;36.1.0
+            platform-tools
+            build-tools;33.0.0
+            platforms;android-33
+            cmake;3.22.1
+            ndk;25.1.8937393
             yes | ~/Android/Sdk/tools/bin/sdkmanager --licenses
       - name: Build APK
         run: 
