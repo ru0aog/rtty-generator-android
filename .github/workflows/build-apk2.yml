@@ -25,6 +25,7 @@ jobs:
           accept-android-sdk-licenses: true
           log-accepted-android-sdk-licenses: true
           packages: |
+            sdkmanager 'build-tools;25.0.2'
             ~/Android/Sdk/tools/bin/sdkmanager build-tools;29.0.2
             platform-tools
             build-tools;33.0.0
