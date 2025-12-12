@@ -17,6 +17,14 @@ jobs:
           sudo apt install -y openjdk-17-jdk python3-pip 
           sudo apt install -y autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo6 cmake libffi-dev libssl-dev
           pip3 install --upgrade Cython==0.29.33 virtualenv
+      - name: Accept Android Licenses
+        run: |
+          mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin"
+          # Скопируем sdkmanager в нужную директорию, если он там не лежит
+          cp "$ANDROID_SDK_ROOT/build-tools/34.0.0/sdkmanager" "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/"
+          "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --licenses --accept-licenses
+        env:
+          ANDROID_SDK_ROOT: ${{ runner.temp }}/android-sdk # Пример пути для runner'а
       - name: Build APK
         run: 
           buildozer android clean
