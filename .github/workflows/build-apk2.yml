@@ -18,7 +18,7 @@ jobs:
           sudo apt install -y autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo6 cmake libffi-dev libssl-dev
           pip3 install --upgrade Cython==0.29.33 virtualenv
       - name: Install SDK
-      - uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v3
         with:
           androidHome: ${{ runner.temp }}/android-sdk
           sdk-tools: true
