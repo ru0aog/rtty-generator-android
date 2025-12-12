@@ -17,6 +17,15 @@ jobs:
           sudo apt install -y openjdk-17-jdk python3-pip 
           sudo apt install -y autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo6 cmake libffi-dev libssl-dev
           pip3 install --upgrade Cython==0.29.33 virtualenv
+      - uses: android-actions/setup-android@v3
+        with:
+          androidHome: ${{ runner.temp }}/android-sdk
+          sdk-tools: true
+          licenses: true
+          tools: 34.0.0
+          platform-tools: 34.0.0
+          build-tools: 34.0.0
+          ndk: 25.1.8937393
       - name: Accept Android Licenses
         run: |
           mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin"
