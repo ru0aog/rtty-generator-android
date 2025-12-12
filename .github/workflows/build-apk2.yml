@@ -1,4 +1,4 @@
-name: Flutter Build
+name: rtty_gen_app
 
 on:
   push:
@@ -13,22 +13,18 @@ jobs:
     runs-on: ubuntu-latest  # Используем Ubuntu для сборки (подходит для APK)
 
     steps:
-      - name: Check out code
-        uses: actions/checkout@v3  # Клонируем репозиторий
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
         with:
-          flutter-version: '3.0.0'  # Укажите нужную версию Flutter
-
-      - name: Install dependencies
-        run: flutter pub get  # Загружаем зависимости
-
-      - name: Build APK
-        run: flutter build apk --release  # Собираем релизный APK
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v3
+          distribution: 'zulu'
+          java-version: '12.x'
+      - uses: subosito/flutter-action@v2
         with:
-          name: apk
-          path: build/app/outputs/flutter-apk/app-release.apk  # Путь к собранному APK
+          flutter-version: '3.16.0'
+          cache: true
+      - run: flutter pub get
+      - run: flutter build apk --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-release.apk
+          path: build/app/outputs/flutter-apk/app-release.apk
