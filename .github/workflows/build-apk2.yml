@@ -14,10 +14,10 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v2  # Клонируем репозиторий
+        uses: actions/checkout@v3  # Клонируем репозиторий
 
       - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@v3
         with:
           flutter-version: '3.0.0'  # Укажите нужную версию Flutter
 
@@ -28,7 +28,7 @@ jobs:
         run: flutter build apk --release  # Собираем релизный APK
 
       - name: Upload APK
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: apk
           path: build/app/outputs/flutter-apk/app-release.apk  # Путь к собранному APK
