@@ -40,8 +40,6 @@ jobs:
           echo "PATH=${{ env.ANDROID_SDK_ROOT }}/cmdline-tools/latest/bin:${{ env.PATH }}" >> $GITHUB_ENV
       - name: Build APK
         run: 
-          buildozer init
-          buildozer -v android clean
           buildozer -v android debug
       - name: Upload APK
         uses: actions/upload-artifact@v4
