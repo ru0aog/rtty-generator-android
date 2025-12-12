@@ -38,6 +38,10 @@ jobs:
           echo "ANDROID_SDK_ROOT=${{ env.ANDROID_SDK_ROOT }}" >> $GITHUB_ENV
           echo "ANDROID_HOME=${{ env.ANDROID_SDK_ROOT }}" >> $GITHUB_ENV
           echo "PATH=${{ env.ANDROID_SDK_ROOT }}/cmdline-tools/latest/bin:${{ env.PATH }}" >> $GITHUB_ENV
+      - name: Install Git
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git
       - name: Build APK
         run: 
           buildozer -v android debug
