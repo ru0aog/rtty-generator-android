@@ -1,13 +1,65 @@
 name: Build Android APK
-
 on:
   push:
+    tags: ['v*']
     branches: [ main ]
   pull_request:
     branches: [ main ]
-
-
+  workflow_dispatch:
 jobs:
+  build-apk:
+    name: Build APK with Buildozer
+    runs-on: ubuntu-latest
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      BUILD_DIR: ./bin
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Скачиваем всю историю коммитов (нужна для некоторых операций Buildozer)
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+          cache: 'gradle'
+      - name: Accept Android SDK licenses
+        run: |
+          mkdir -p "$ANDROID_HOME/licenses"
+          echo "d56f5187479451eabf01fb78af6dfcb131a6481e" > "$ANDROID_HOME/licenses/android-sdk-license"
+          echo "84831b9409646a918e30573bab4c9c91346d8abd" >> "$ANDROID_HOME/licenses/android-sdk-preview-license"
+          echo "Android SDK licenses accepted"
+      - name: Build APK using Kivy Buildozer (Docker)
+        run: |
+          docker run --rm \
+            -v $(pwd):/home/user/hostcwd \
+            -v ~/.buildozer:/home/user/.buildozer \
+            kivy/buildozer \
+            android debug
+        working-directory: ./
+
+      - name: Verify APK was built
+        run: |
+          if [ -f "$BUILD_DIR/rttygen-0.1-debug.apk" ]; then
+            echo "APK successfully built"
+            ls -la "$BUILD_DIR/"
+          else
+            echo "APK not found. Check Buildozer logs."
+            exit 1
+          fi
+
+      - name: Upload APK to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.repository.releases[0].upload_url }}
+          asset_path: "$BUILD_DIR/rttygen-0.1-debug.apk"
+          asset_name: "rtty_generator_${{ github.ref_name }}.apk"
+          asset_content_type: "application/vnd.android.package-archive"
   build-android:
     runs-on: ubuntu-latest
     steps:
