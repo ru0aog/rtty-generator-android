@@ -7,44 +7,17 @@ on:
     branches: [ main ]
   workflow_dispatch:
 jobs:
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v4
-    - uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.16.0'
-    - run: flutter pub get
-    - run: flutter build apk --release
-    - uses: actions/upload-artifact@v4
-      with:
-        name: release-apk
-        path: build/app/outputs/flutter-apk/app-release.apk
-
-    - name: Checkout code
-      uses: actions/checkout@v4
-    - name: Build APK using Kivy Buildozer Docker
-      run: |
-        docker run --rm -v $(pwd):/home/user/hostcwd kivy/buildozer android debug
-    - name: Verify APK was built
-      run: |
-        if [ -f "$BUILD_DIR/rttygen-0.1-debug.apk" ]; then
-          echo "APK successfully built"
-          ls -la "$BUILD_DIR/"
-        else
-          echo "APK not found. Check Buildozer logs."
-          exit 1
-        fi
-
-    - name: Upload APK to GitHub Release
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ github.event.repository.releases[0].upload_url }}
-        asset_path: "$BUILD_DIR/rttygen-0.1-debug.apk"
-        asset_name: "rtty_generator_${{ github.ref_name }}.apk"
-        asset_content_type: "application/vnd.android.package-archive"
-  
-        path: bin/*.apk
-        retention-days: 7
+  build-apk:
+    name: Build APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
+      - run: flutter pub get
+      - run: flutter build apk --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
