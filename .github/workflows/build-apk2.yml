@@ -1,0 +1,53 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+          pip install --upgrade pip
+          pip install Cython==0.29.33 buildozer
+
+
+      - name: Initialize Buildozer
+        run: buildozer init
+
+      - name: Configure buildozer.spec
+        run: |
+          # Замените значения на свои
+          sed -i 's/title = My Application/title = Генератор RTTY/g' buildozer.spec
+          sed -i 's/package.name = myapp/package.name = rttygen/g' buildozer.spec
+          sed -i 's/package.domain = org.test/package.domain = com.example/g' buildozer.spec
+          sed -i 's/source.dir = ./main.py/source.dir = ./main.py/g' buildozer.spec
+          sed -i 's/requirements = python3/requirements = python3,kivy,requests/g' buildozer.spec
+          sed -i 's/orientation = all/orientation = portrait/g' buildozer.spec
+          sed -i 's/android.api = 31/android.api = 33/g' buildozer.spec
+
+      - name: Build APK
+        run: yes | buildozer -v android debug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-file
+          path: bin/*.apk
+          retention-days: 7
