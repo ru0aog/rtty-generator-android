@@ -12,3 +12,8 @@ fullscreen = 0
 [buildozer]
 log_level = 2
 platform = android
+
+android.api = 31
+android.minapi = 21
+android.target_api = 31
+android.permissions = INTERNET, RECORD_AUDIO
